@@ -9,7 +9,7 @@ This is a userscript, used with TamperMonkey or GreaseMonkey, for beginner polyg
 
 ## Isn't consistency tool enough? 
 The [consistency tool](https://translate.wordpress.org/consistency/) is awesome, but as far as I have seen, only finds full strings, not substrings.
-Example: even though the string "array" is inside some strings translated [here](https://translate.wordpress.org/projects/wp/dev/ro/default/?filters%5Bterm%5D=array), the consistency tool doesn't find any [here][https://translate.wordpress.org/consistency/?search=array&set=ro%2Fdefault&project=] so you have to search within the project for substrings. 
+Example: even though the string "array" is inside some strings translated [here](https://translate.wordpress.org/projects/wp/dev/ro/default/?filters%5Bterm%5D=array), the consistency tool doesn't find any [here](https://translate.wordpress.org/consistency/?search=array&set=ro%2Fdefault&project=) so you have to search within the project for substrings. 
 
 ## Installation
 
