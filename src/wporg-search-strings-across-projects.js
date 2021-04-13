@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Find translations across projects
 // @namespace    https://translate.wordpress.org
-// @version      0.2
+// @version      1.1
 // @description  Search translations across projects in a locale
 // @author       Vlad Timotei
 // @match        https://translate.wordpress.org/*
@@ -43,7 +43,7 @@ var search_url = [];
   const search_html_output = `
     <form id='search-in-projects' autocomplete='on'>
 	<input type='text' id='search-in-projects-for-what' placeholder='Search for...'  >
-	<button type='button' id='search-in-projects-action'>Search</button>
+	<input type='submit' id='search-in-projects-action' value='Search'>
 	<button type='button' id='search-in-projects-close-tabs'>Close all results</button>
 	<input type='checkbox' id='search-in-this-project' class='search-in-projects-option'>
 	<label for='search-in-this-project'>this project</label>
@@ -67,9 +67,6 @@ var search_url = [];
     });
   } else
     $(".filter-toolbar").after(search_html_output);
-
-  $("#search-in-projects-action").click(search_in_projects);
-  $("#search-in-projects-close-tabs").click(close_tabs);
 
   // User options stored in Local Storage
   if (getLS('opt-search-in-this-project') === null) {
@@ -102,6 +99,15 @@ var search_url = [];
     setLS('opt-search-notice-dismissed', true);
 
   });
+
+  $(document).ready(function(){
+  $("#search-in-projects").submit(function(event){
+    event.preventDefault();
+    search_in_projects();
+  });
+   //$("#search-in-projects-action").click(search_in_projects);
+  $("#search-in-projects-close-tabs").click(close_tabs);
+});
 
 })();
 
