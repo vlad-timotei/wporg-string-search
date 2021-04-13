@@ -29,10 +29,14 @@ var search_url = [];
     #search-in-projects { display: inline-block; }
     #search-in-projects-action,
     #search-in-projects input,
+    #search-in-projects button,
     #search-in-projects label {vertical-align: middle}
+    #search-in-projects input[type=submit],
+    #search-in-projects button {height: 25px;}
     #search-in-projects input[type=checkbox] {margin-left: 5px;}
     #search-in-projects-close-tabs { display:none; }
-    #search-in-projects-action { font-size: 1.1em;}
+    #search-in-projects-action,
+    #search-in-projects-close-tabs { font-size: 1.1em;}
     .search-in-projects-notice { padding-bottom:15px; }
     #search-in-projects-dismiss-notice { cursor:pointer; }
     #result_page_notice span {color:#d04300; font-weight: 500;}
