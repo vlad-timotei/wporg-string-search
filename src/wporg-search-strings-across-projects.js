@@ -5,7 +5,7 @@
 // @description  Search translations across projects in a locale
 // @author       Vlad Timotei
 // @match        https://translate.wordpress.org/*
-// @grant        none
+// @grant        window.close
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // @updateURL    https://github.com/vlad-timotei/wporg-string-search/raw/main/src/wporg-search-strings-across-projects.js
 // @downloadURL  https://github.com/vlad-timotei/wporg-string-search/raw/main/src/wporg-search-strings-across-projects.js
