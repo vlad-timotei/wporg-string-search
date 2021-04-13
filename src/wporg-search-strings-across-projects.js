@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         Search translations across projects
-// @namespace    translate.wordpress.org
+// @namespace    https://translate.wordpress.org
 // @version      0.1
 // @description  Search translations across projects in a locale
 // @author       Vlad Timotei
 // @match        https://translate.wordpress.org/*
 // @grant        none
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @updateURL    https://raw.githubusercontent.com/vlad-timotei/wporg-string-search/main/src/wporg-search-strings-across-projects.js
+// @downloadURL  https://raw.githubusercontent.com/vlad-timotei/wporg-string-search/main/src/wporg-search-strings-across-projects.js
 // ==/UserScript==
 
 var tabs = [];
