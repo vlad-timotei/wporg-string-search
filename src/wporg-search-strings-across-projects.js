@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Search translations across projects
+// @name         Find translations across projects
 // @namespace    https://translate.wordpress.org
-// @version      0.1
+// @version      0.2
 // @description  Search translations across projects in a locale
 // @author       Vlad Timotei
 // @match        https://translate.wordpress.org/*
