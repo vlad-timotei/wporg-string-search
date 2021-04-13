@@ -14,7 +14,7 @@ Example: even though the string "array" is inside some strings translated [here]
 ## Installation
 
 1. First, install the <a href="http://tampermonkey.net/">Tampermonkey</a> or <a href="http://www.greasespot.net/">Greasemonkey</a> browser extensions.
-2. Then, [visit this page](https://raw.githubusercontent.com/vlad-timotei/wporg-string-search/main/src/wporg-search-strings-across-projects.js). TamperMonkey or GreaseMonkey will take over from there.
+2. Then, [visit this page](https://raw.githubusercontent.com/vlad-timotei/wporg-string-search/main/src/wporg-search-strings-across-projects.js). TamperMonkey or GreaseMonkey should take over from there. If not, manually copy the url and install it.
 
 ## Known issues
 - Pressing enter does not trigger the search results to show up
