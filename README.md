@@ -2,7 +2,11 @@
 
 ## About the project
 
-This is a userscript, used with TamperMonkey or GreaseMonkey, for beginner polyglots that would like to find out how a specific string was translated before. It will search in 
+This is a userscript, used with TamperMonkey or GreaseMonkey.
+For consistency purposes, I sometimes want to see previous translations of a certain word.
+Current workflow involves filtering trough current project, wp/dev project and consistency tool for a certain word, but it's time consuming.
+
+This script opens search results for 
 - current project, current locale
 - WordPress development project, current locale
 - consistency tool, current locale
