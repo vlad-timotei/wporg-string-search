@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Find translations across projects
 // @namespace    https://translate.wordpress.org
-// @version      1.1
+// @version      1.0
 // @description  Search translations across projects in a locale
 // @author       Vlad Timotei
 // @match        https://translate.wordpress.org/*
@@ -109,7 +109,6 @@ var search_url = [];
     event.preventDefault();
     search_in_projects();
   });
-   //$("#search-in-projects-action").click(search_in_projects);
   $("#search-in-projects-close-tabs").click(close_tabs);
 });
 
