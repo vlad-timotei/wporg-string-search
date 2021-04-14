@@ -137,6 +137,7 @@ function search_in_projects() {
       }
     }
     $("#search-in-projects-close-tabs").show();
+    $("#search-in-projects-for-what, #search-in-projects-action ").hide();
   } else {
     $('#search-in-projects-for-what').attr("placeholder", "String cannot be empty!");
     setTimeout(function() {
@@ -153,6 +154,7 @@ function close_tabs() {
     }
   }
   $("#search-in-projects-close-tabs").hide();
+  $("#search-in-projects-for-what, #search-in-projects-action ").show();
 }
 
 
