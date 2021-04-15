@@ -62,14 +62,16 @@ var search_url = [];
       setLS('opt-' + $(this).prop('id'), false);
   });
 
-  //Initial notice
+  /* 
+  //Initial notice just for UserScript version
   const text_initial_notice = `
     Please note that your browser will block this script to open more than one new window at a time.
     In order to fix that, please click on the browser notice first time you use cross-search and select
     <i>Always allow pop ups from translate.wordpress.org</i>`;
   if (getLS('opt-search-notice-dismissed') === null)
     $("#search-in-projects").before('<div class="search-in-projects-notice"> ' + text_initial_notice + ' <a id="search-in-projects-dismiss-notice">Dismiss this notice</a><div>');
-
+  
+  */
   $("#search-in-projects-dismiss-notice").click(function() {
     $(".search-in-projects-notice").hide(500);
     setLS('opt-search-notice-dismissed', true);

@@ -1,3 +1,16 @@
+// ==UserScript==
+// @name         Find translations across projects
+// @namespace    https://translate.wordpress.org
+// @version      1.2
+// @description  Search translations across projects in a locale
+// @author       Vlad Timotei
+// @match        https://translate.wordpress.org/*
+// @grant        window.close
+// @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @updateURL    https://github.com/vlad-timotei/wporg-string-search/raw/main/src/wporg-search-strings-across-projects.js
+// @downloadURL  https://github.com/vlad-timotei/wporg-string-search/raw/main/src/wporg-search-strings-across-projects.js
+// ==/UserScript==
+
 var tabs = [];
 var tabs_state = {
   'this-project': 'closed',
@@ -11,10 +24,25 @@ var search_url = [];
   let params = new URLSearchParams(document.location.search.substring(1));
   let is_result_page = params.get("resultpage");
 
-  /*
-  Only for TamperMonkey
-  const style_rules = '';
-  $('head').append(style_rules);*/
+  const style_rules = `
+    <style type="text/css">
+    #search-in-projects { display: inline-block; }
+    #search-in-projects-action,
+    #search-in-projects input,
+    #search-in-projects button,
+    #search-in-projects label {vertical-align: middle}
+    #search-in-projects input[type=submit],
+    #search-in-projects button {height: 25px;}
+    #search-in-projects input[type=checkbox] {margin-left: 5px;}
+    #search-in-projects-close-tabs { display:none; }
+    #search-in-projects-action,
+    #search-in-projects-close-tabs { font-size: 1.1em;}
+    .search-in-projects-notice { padding-bottom:15px; }
+    #search-in-projects-dismiss-notice { cursor:pointer; }
+    #result_page_notice span {color:#d04300; font-weight: 500;}
+    </style>
+    `;
+  $('head').append(style_rules);
 
   const search_html_output = `
     <form id='search-in-projects' autocomplete='on'>
@@ -62,16 +90,14 @@ var search_url = [];
       setLS('opt-' + $(this).prop('id'), false);
   });
 
-  /* 
-  //Initial notice just for UserScript version
+  //Initial notice
   const text_initial_notice = `
     Please note that your browser will block this script to open more than one new window at a time.
     In order to fix that, please click on the browser notice first time you use cross-search and select
     <i>Always allow pop ups from translate.wordpress.org</i>`;
   if (getLS('opt-search-notice-dismissed') === null)
     $("#search-in-projects").before('<div class="search-in-projects-notice"> ' + text_initial_notice + ' <a id="search-in-projects-dismiss-notice">Dismiss this notice</a><div>');
-  
-  */
+
   $("#search-in-projects-dismiss-notice").click(function() {
     $(".search-in-projects-notice").hide(500);
     setLS('opt-search-notice-dismissed', true);
@@ -83,7 +109,6 @@ var search_url = [];
     event.preventDefault();
     search_in_projects();
   });
-   //$("#search-in-projects-action").click(search_in_projects);
   $("#search-in-projects-close-tabs").click(close_tabs);
 });
 
