@@ -7,8 +7,8 @@
 // @match        https://translate.wordpress.org/*
 // @grant        window.close
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
-// @updateURL    https://github.com/vlad-timotei/wporg-string-search/raw/main/src/wporg-search-strings-across-projects.js
-// @downloadURL  https://github.com/vlad-timotei/wporg-string-search/raw/main/src/wporg-search-strings-across-projects.js
+// @updateURL    https://raw.githubusercontent.com/vlad-timotei/wporg-string-search/main/dist/latest/userscript/wporg-string-search-standalone.js
+// @downloadURL  https://raw.githubusercontent.com/vlad-timotei/wporg-string-search/main/dist/latest/userscript/wporg-string-search-standalone.js
 // ==/UserScript==
 
 var tabs = [];
