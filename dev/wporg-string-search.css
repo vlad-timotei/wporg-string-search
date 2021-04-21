@@ -28,3 +28,13 @@
 	.my-glossary {padding-top:10px;}
 	 
     table.my-glossary.glossary  tr  td { padding:5px !important;}
+	
+	.google-translate-string {    
+	margin-left: 10px !important;
+    margin-top: 2px !important;
+    height: 26px !important;
+	}
+	
+	input.search-in-projects-word {
+    margin-right: 5px;
+}

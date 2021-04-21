@@ -11,17 +11,25 @@ var search_url = {
 	'plugin': '',
     'this-project': ''
 };
-var notice_time; 
+var notice_time, google_translate_tab;
+var google_translate_tab_status = 'closed'; 
 
-/* //, $("#"+$(this).closest('tr').attr('id')+" form .search-in-projects-plugin-slug").val()); */
+const protocol = 'https://';
+const hostname = window.location.hostname;
+const pathname = window.location.pathname;
+const resultpage = '&resultpage=yes';
+var findlocale = pathname.split("/");
+const current_locale = $(findlocale).get(-3) + '/' + $(findlocale).get(-2);
+const google_locale = $(findlocale).get(-3);
+
 
 (function() {
   'use strict';
   display_html_output();
   sync_user_options();
-  display_glossary();
+  display_glossary_and_google_translate();
   $(document).ready(main_init);
-
+  
 })();
 
 function display_html_output(){
@@ -104,6 +112,15 @@ function main_init(){
    $(".search-in-projects-plugin-slug").toggle();
   });
   
+   $(".google-translate-string").click(function(){
+	   if (google_translate_tab_status == 'opened')
+	      google_translate_tab.close();
+       google_translate_tab = window.open( $(this).data('google-translate-string') , "_blank");
+	   google_translate_tab_status = 'opened';
+  });
+  
+  $(window).on("beforeunload", close_tabs);
+ 
   
 }
 
@@ -121,14 +138,8 @@ function submit_form(event){
 
 function search_in_projects(searching_for, also_searching_in_plugin) {
 
-  const protocol = 'https://';
-  const hostname = window.location.hostname;
-  const pathname = window.location.pathname;
-  const resultpage = '&resultpage=yes';
-  const filters = '?filters[term]=' + searching_for + '&filters[status]=current';
-  var findlocale = pathname.split("/");
-  const current_locale = $(findlocale).get(-3) + '/' + $(findlocale).get(-2);
   var any_tab = 0; 
+  const filters = '?filters[term]=' + searching_for + '&filters[status]=current';
   
   search_url['this-project'] = encodeURI(protocol + hostname + pathname + filters + resultpage);
   search_url['wp'] = encodeURI(protocol + hostname + '/projects/wp/dev/' + current_locale + filters + resultpage);
@@ -173,20 +184,33 @@ function close_tabs() {
       tabs_state[tab_key] = 'closed';
     }
   }
+  if (google_translate_tab_status == 'opened')
+	      google_translate_tab.close();
   $(".search-in-projects-close-tabs").hide();
   $(".search-in-projects-word, .search-in-projects-action ").show();
 }
 
 
-function display_glossary(){
-	$(".search-in-projects").each(function() {show_string_glossary($(this).closest('tr').attr('id'))});
+function display_glossary_and_google_translate(){
+	var orig_txt, string_id;
+	$(".search-in-projects").each(function() {
+		string_id = $(this).closest('tr').attr('id');
+		orig_txt = $( "#" + string_id + " .source-string__singular span.original" ).text();
+		show_string_glossary(string_id, orig_txt);
+		show_google_translate(string_id, orig_txt);
+		
+	});
 }
 
-function show_string_glossary(string_id){
+function show_google_translate(string_id, orig_txt){
+  var google_search_url = encodeURI(protocol + 'translate.google.com/?sl=en&tl='+ google_locale +'&text=' + orig_txt + '&op=translate'); 
+  var google_search_output = "<button type='button' class='google-translate-string' data-google-translate-string='" + google_search_url + "'>Google Translate</button>";
+  $("#"+string_id+" .editor-panel__left .panel-header h3").append(google_search_output); 
+}
 
-	var orig_txt = $( "#" + string_id + " .source-string__singular span.original" ).text();
-	my_glossary_output="";
-	my_glossary.forEach(function (item, index) {show_word_in_glossary (item, index, orig_txt)});
+function show_string_glossary(string_id, orig_txt){
+	var my_glossary_output="";
+	my_glossary.forEach(function (item, index) { my_glossary_output += show_word_in_glossary (item, index, orig_txt)});
 	if(my_glossary_output!=""){
 		my_glossary_output="<table class='my-glossary glossary'><thead><tr><th colspan='2'>My Glossary</th></tr></thead>"+my_glossary_output+"</table>";
 		$("#"+string_id+" .search-in-projects").append(my_glossary_output); 
@@ -195,7 +219,8 @@ function show_string_glossary(string_id){
 
 function show_word_in_glossary(item, index, original_string){
 	if(original_string.toLowerCase().includes(my_glossary[index][0].toLowerCase()))
-		my_glossary_output+="<tr><td>"+my_glossary[index][0]+" </td><td> "+my_glossary[index][1]+"</td></tr>";
+	return "<tr><td>"+my_glossary[index][0]+" </td><td> "+my_glossary[index][1]+"</td></tr>";
+    return "";
 }
 
 function setLS(name, value) {
