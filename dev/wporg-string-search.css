@@ -1,0 +1,30 @@
+    .search-in-projects { padding:0 15px 0 15px; }
+    .search-in-projects-action,
+    .search-in-projects input,
+    .search-in-projects button,
+    .search-in-projects label {vertical-align: middle}
+	.search-in-projects label {cursor:pointer;}
+    .search-in-projects input[type=submit],
+    .search-in-projects button {height: 25px;}
+    .search-in-projects input[type=checkbox] {margin-left: 5px;}
+    .gp-content button.search-in-projects-close-tabs,
+	.search-in-projects-plugin-slug {display:none;}
+	.search-in-projects-plugin-slug {height: 1.5em; border: #efefef 1px solid;}
+    .search-in-projects-action,
+    .search-in-projects-close-tabs { font-size: 1.1em;}
+    .search-in-projects-notice { padding-bottom:15px; }
+    .search-in-projects-dismiss-notice { cursor:pointer; }
+	.search-in-projects .error-notice {display:block; height:20px; color: #6d6d6d;}
+    #result_page_notice span {color:#d04300; font-weight: 500;}
+	.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+	.my-glossary {padding-top:10px;}
+	 
+    table.my-glossary.glossary  tr  td { padding:5px !important;}
