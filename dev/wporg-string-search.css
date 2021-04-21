@@ -25,7 +25,7 @@
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
-	.my-glossary {padding-top:10px;}
+	.my-glossary {padding-top:10px; margin-bottom:15px;}
 	 
     table.my-glossary.glossary  tr  td { padding:5px !important;}
 	

@@ -20,7 +20,7 @@ const pathname = window.location.pathname;
 const resultpage = '&resultpage=yes';
 var findlocale = pathname.split("/");
 const current_locale = $(findlocale).get(-3) + '/' + $(findlocale).get(-2);
-const google_locale = $(findlocale).get(-3);
+const short_locale = $(findlocale).get(-3);
 
 
 (function() {
@@ -203,7 +203,7 @@ function display_glossary_and_google_translate(){
 }
 
 function show_google_translate(string_id, orig_txt){
-  var google_search_url = encodeURI(protocol + 'translate.google.com/?sl=en&tl='+ google_locale +'&text=' + orig_txt + '&op=translate'); 
+  var google_search_url = encodeURI(protocol + 'translate.google.com/?sl=en&tl='+ short_locale +'&text=' + orig_txt + '&op=translate'); 
   var google_search_output = "<button type='button' class='google-translate-string' data-google-translate-string='" + google_search_url + "'>Google Translate</button>";
   $("#"+string_id+" .editor-panel__left .panel-header h3").append(google_search_output); 
 }
@@ -218,8 +218,8 @@ function show_string_glossary(string_id, orig_txt){
 }
 
 function show_word_in_glossary(item, index, original_string){
-	if(original_string.toLowerCase().includes(my_glossary[index][0].toLowerCase()))
-	return "<tr><td>"+my_glossary[index][0]+" </td><td> "+my_glossary[index][1]+"</td></tr>";
+	if(original_string.toLowerCase().includes(my_glossary[index]['en'].toLowerCase()))
+	return "<tr><td>"+my_glossary[index]['en']+" </td><td> "+my_glossary[index][short_locale]+"</td></tr>";
     return "";
 }
 
