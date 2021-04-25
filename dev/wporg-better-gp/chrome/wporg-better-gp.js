@@ -9,7 +9,7 @@
 function main_init(){
 	const pathname = window.location.pathname;
     if ( pathname == "/locale/ro/default/" ){
-		/* Snippets */
+		/** Snippets **/
 		init_snippets_html_placeholders();
 		init_add_btn();
 		init_remove_btn();
@@ -17,32 +17,48 @@ function main_init(){
 	}
 	
 	if( pathname.search('projects') != -1){
-		/*Additional checks*/
-		run_additional_checks();
+		run_translation_checks();
 	}
 	
 }
 
-/* Additional checks - spaces, dots, placeholders */
-function run_additional_checks(){
-	$("#translations thead tr").first().append('<th class="gp-checks-th">—</th>');
-	$("#translations tr.editor td").not(".my-glossary td").attr('colspan',6);
-	
+/**	Translation checks 
+*	- additional or missing end or start spaces
+*	- additional or missing end spaces
+*	- additional, missing or broken placeholders
+*	- different ending character
+*	- wrong diacritics (ro_RO)
+*	- wrong quotes (ro_RO)
+*	- double spaces
+*	- additional slash spaces (ro_RO)
+*	- & symbol (ro_RO)
+**/
+
+function run_translation_checks(){
 	$("#translations tbody tr.preview.has-translations").each(function(){
-		let original = $(this).find('td.original .original-text').text();
-		let translated = $(this).find('td.translation .translation-text').text();
-		let check_results = check_translation(original, translated);
-		let preview_html_output = '<td class="gp-checks-preview">' + (( check_results != 'none') ? '<span class = "gp-checks-warnings" >Probleme!</span>' : '<span class = "gp-checks-passed"> OK </span>') + '</td>';
-		let editor_html_output =  '<dl><dt>Warnings:</dt><dd>' + check_results + '</ul></dd></dl>';
+		var translated = [];
+		var check_results, translations; 
+		var preview_html_output = "", editor_html_output = "";
 		
+		let original = $(this).find('td.original .original-text').text();
+		$(this).find('td.translation .translation-text').each( function(){	translated.push( $( this ).text() ); } );
+		translations = translated.length;
+	
+		for (var i = 0; i < translations; i++){
+			check_results = check_translation(original, translated[i]);
+			editor_html_output += '<dl><dt>Warnings' + ((translations > 1) ? (' #'+( i + 1 ) ) : '' ) +':</dt><dd>' + check_results + '</dd></dl>';
+			if(check_results != 'none')
+				preview_html_output = 'error';
+		}
+		
+		preview_html_output = ( preview_html_output != "" ) ? '<img class = "gp-checks-warnings" src="https://wptools.vladtimotei.ro/wporg-better-gp/warning.png">' : '';
 		$("#" + $(this).attr('id').replace("preview", "editor")).find('.meta .status-actions').after(editor_html_output); 
-		$(this).append(preview_html_output);
+		$(this).find('.actions .action.edit').prepend(preview_html_output);		
 	});
-	
-	
 }
 
 function check_translation (original, translated){
+
 	var warnings = {
 		'start_space' 	:	"",
 		'end_char'		: 	"",
@@ -60,55 +76,79 @@ function check_translation (original, translated){
 	let last_original_char = original.substr(original.length - 1);
 	let last_translated_char = translated.substr(translated.length - 1);
 	
-	let wrong_diacritics =  /[ÃãŞşŢţ]/ig;
-	let wrong_quotes = /["]/g;
+	let wrong_double_spaces = /  /g;
 	
-	/* Starts with a space */
+	/** Romanian specific rules **/
+	let wrong_diacritics =  /[ÃãŞşŢţ]/ig;  
+	let wrong_quotes = /[^=]"(?:[^"<=]*)"/g;
+	let wrong_slash_spaces = / [/] /g;
+	let wrong_and = /[&](?!.{1,7}?;)/g;
+	
+	/** RegEx explications - will need 
+	**	wrong_double_spaces = /  /g;			Find globally double spaces
+	**	wrong_diacritics =  /[ÃãŞşŢţ]/ig; 		Find globally, case insensitive any of the chars inside []
+	**	wrong_quotes = /[^=]"(?:[^"<=]*)"/g;		Find globally strings, using a non-capturing group
+	**											- doesn't start with =
+	**											- next, have "
+	**											- next, don't have ", = nor < in any of the following characters
+	**											- ends with "
+	** wrong_slash_spaces = / [/] /g;			Find globally strings that have space/space
+	** wrong_and = /[&](?!.{1,7}?;)/g;			Find globally strings, using negative lookahead and lazy matching
+	**											- starts with &
+	**											- doesn't have ; after 1 to 7 characters
+	**/ 
+	
+	/** Starts with a space **/
 	if(first_translated_char == " "){
 		warnings['start_space'] = "Additional start space";
 		if(first_original_char  == " ")
-			warnings['start_space'] += '*';
+			warnings['start_space'] += ' (same as original)';
 	}
 	
-	/* Different ending character */
+	/** Different ending character **/
 	if( last_original_char != last_translated_char ){
 		
-		/* Additional end space */
+		/** Additional end space **/
 	    if( last_translated_char == " ")
 			warnings['end_char'] = "Additional end space";
 		
-		/* Missing end . */
+		/** Missing end . **/
 		if( last_original_char == "." && warnings['end_char'] == "" )
 			warnings['end_char'] = "Missing end .";
 	
-		/* Additional end . */
+		/** Additional end . **/
 		if( last_translated_char == "." && warnings['end_char'] == "" && last_original_char != "…" )
 			warnings['end_char'] = "Additional end .";
 	
-		/* Missing end : */
+		/** Missing end : **/
 		if( last_original_char == ":" && warnings['end_char'] == "" )
 			warnings['end_char'] = "Missing end :";
 	
-		/* Additional end : */
+		/** Additional end : **/
 		if( last_translated_char == ":" && warnings['end_char'] == "" )
 			warnings['end_char'] = "Additional end :";
 		
-		/* Other different symbol */
-		if ((/[^a-zA-Z1-50]/).test(last_original_char) && warnings['end_char'] == "" && last_original_char != "…")
-			warnings['end_char'] = "Differend ending symbol: <b>" + last_original_char + "</b>";
+		/** Other different symbol **/
+		if ((/[^a-zA-Z1-50]/).test(last_original_char) && warnings['end_char'] == "" && last_original_char != "…" && last_original_char != '"' )
+			warnings['end_char'] = "Notice: different ending symbol: <b>" + last_original_char + "</b>";
 	}
 	
-	/* Using wrong diacritics */
+	/** Using wrong diacritics **/
 	var using_wrong_diacritics = translated.match(wrong_diacritics);
 		if(using_wrong_diacritics != null)
-			warnings['wrong_diacritics'] = 'You are using wrong diacritics: ' + using_wrong_diacritics.toString();
+			warnings['wrong_diacritics'] = using_wrong_diacritics.length + ' wrong diacritic(s) found: ' + using_wrong_diacritics.toString();
 	
-	/* Maybe using wrong quotes */
+	/** Maybe using wrong quotes **/
 	var using_wrong_quotes = translated.match(wrong_quotes);
 		if(using_wrong_quotes != null)
-			warnings['wrong_quotes'] = 'You might be using wrong quotes: "';
+		{   var i;
+			for (i = 0; i < using_wrong_quotes.length; i++) 
+              using_wrong_quotes [i] = using_wrong_quotes[i].substring(1)
+			warnings['wrong_quotes'] = using_wrong_quotes.length + ' pair' + ( ( i > 1 ) ? 's' : '' ) + ' of wrong quotes: ' + using_wrong_quotes.toString();
+		}
+
 		
-	/* Wrong Placeholders */
+	/** Wrong Placeholders **/
 	let placeholder_pattern =  /(?:%[a-z]|%\d[$][a-z])/ig; 
 	var original_ph = original.match(placeholder_pattern);
 	var translated_ph = translated.match(placeholder_pattern);
@@ -139,12 +179,29 @@ function check_translation (original, translated){
 		}
 	}
 	
-	/* Results */
+
+	/** Double spaces **/
+	var double_spaces = translated.match(wrong_double_spaces);
+	warnings['others'] = (double_spaces != null) ? (double_spaces.length + " double spaces detected" ) : "";
+
+	/** Slash spaces **/
+	var slash_spaces = translated.match(wrong_slash_spaces);
+	if (slash_spaces != null)
+		warnings['others'] += (warnings['others'] != "") ? "<li>"+slash_spaces.length+" / space detected</li>" : slash_spaces.length+" / space detected";
+
+	/** & **/
+	var and_symb = translated.match(wrong_and);
+	if (and_symb != null)
+		warnings['others'] += (warnings['others'] != "") ? "<li>"+and_symb.length+" & detected</li>" : and_symb.length+" & detected";
+
+	
+	/** Results **/
 	var results = ( warnings['start_space'] != "" ) ? ( '<li>' + warnings['start_space'] + '</li>' ) : '';
     results +=	( warnings['end_char'] != "" ) ? ( '<li>' + warnings['end_char'] + '</li>' ) : '';
 	results +=	( warnings['placeholders'] != "" ) ? ( '<li>' + warnings['placeholders'] + '</li>' ) : '';
 	results +=	( warnings['wrong_diacritics'] != "" ) ? ( '<li>' + warnings['wrong_diacritics'] + '</li>' ) : '';
 	results +=	( warnings['wrong_quotes'] != "" ) ? ( '<li>' + warnings['wrong_quotes'] + '</li>' ) : '';
+	results +=	( warnings['others'] != "" ) ? ( '<li>' + warnings['others'] + '</li>' ) : '';
 	
 	results = ( results == "" ) ? "none" : ( '<ul class="gp-checks-list">' +results + '</ul>');
 	
@@ -152,7 +209,7 @@ function check_translation (original, translated){
 }
 
 
-/* Snippets - Saving process */ 
+/** Snippets - Saving process **/ 
 
 function init_snippets_html_placeholders(){
 	$("#projects .project").each(function(){
@@ -161,7 +218,7 @@ function init_snippets_html_placeholders(){
 		
 		
 		var snippet_btns_html = ' <a data-gp-project="'+project_slug+'" class="inactive button contribute-button remove-snippet-button">Remove snippet</a>';
-		snippet_btns_html += ' <a data-gp-project="'+project_slug+'" class="button contribute-button add-snippet-button">Save snippet</a>';
+		snippet_btns_html += ' <a data-gp-project="'+project_slug+'" class="button contribute-button add-snippet-button">Update snippet</a>';
 		
 		$(this).find(".project-status").prepend('<span class="gp-diff-date"></span>');
 		$(this).find(".project-bottom").append(snippet_btns_html);
@@ -228,7 +285,7 @@ function display_snippet_info(project_slug){
 }
 
 
-/* Snippets - Deleting process */
+/** Snippets - Deleting process **/
 
 function init_remove_btn(){
 	$(".remove-snippet-button").click(function(){ 
@@ -282,7 +339,7 @@ function remove_all_snippets(){
 	
 }
 
-/* Other functions */
+/** Other functions **/
 function temp_msg(elem, new_msg, default_msg, dissapear){
 
 	$(elem).fadeOut(function() { $(this).text(new_msg).fadeIn(500); });

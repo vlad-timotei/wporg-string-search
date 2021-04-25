@@ -38,3 +38,16 @@ table.translations th.actions {
 ul.gp-checks-list li {
     color: red;
 }
+span.gp-checks-passed {
+    color: grey;
+}
+
+span.gp-checks-warnings {
+
+background:url("https://wptools.vladtimotei.ro/wporg-better-gp/warning.png");
+background-repeat:no-repeat;
+
+
+
+
+}
