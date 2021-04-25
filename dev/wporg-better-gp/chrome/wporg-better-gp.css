@@ -1,0 +1,40 @@
+span.gp-diff {
+    color: #8a9093;
+}
+
+span.gp-diff-date {
+    color: #8a9093;
+    float: right;
+    margin-right: 10px;
+	margin-top: -20px;
+    top: 20px;
+    position: relative;
+	font-size:12px;
+	margin-bottom: -5px;
+}
+
+span.gp-diff.adif {
+    color: red;
+}
+
+.contribute-button.remove-all-snippets-button {
+  
+  float: right;
+    position: relative;
+    bottom: -5px;
+
+}
+
+table.translations th.gp-checks-th {
+    width: 2em;
+    text-align: center;
+}
+
+table.translations th.actions {
+    width: 3.5em;
+    text-align: center;
+}
+
+ul.gp-checks-list li {
+    color: red;
+}
