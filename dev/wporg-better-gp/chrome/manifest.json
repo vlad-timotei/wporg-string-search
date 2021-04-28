@@ -8,18 +8,24 @@
       "tabs",
       "storage"
    ],
+   "web_accessible_resources": [
+    "js/wporg-better-gp-checks.js",
+    "js/wporg-better-gp-snippets.js",
+    "js/wporg-better-gp-search.js",
+    "js/wporg-better-gp-functions.js",
+    "img/warning.png"
+  ],
    "content_scripts":[
       {
          "matches":[
             "https://translate.wordpress.org/*"
          ],
-         "css":[
-            "wporg-better-gp.css"
-         ],
          "js":[
-            "jquery-3.6.0.min.js",
-            "wporg-better-gp.js"
-         ]
+            "js/init.js"
+         ],
+	"css":[
+		"css/wporg-better-gp.css"
+	]
       }
    ]
 }
