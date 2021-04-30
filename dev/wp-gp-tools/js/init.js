@@ -3,24 +3,33 @@
  ** Scripts are loaded at the end of the head to override some editor keyboard shortcuts*
  */
 
-var jsScripts = ['checks', 'snippets', 'search', 'functions' ];
-script(jsScripts);
+var wp_gp_tools_scripts = ['functions', 'settings' , 'checks', 'snippets', 'glossary' ];
+/** wp-gp-tools-search.js must load as content_script to prevent new windows being blocked */
+
+var wp_gp_tools_glossaries = ['glossary-ro_RO'];
+/** Until I figgure out how to let the user upload own Glossary, here's this ugly implementation for my own usage 
+ ** Only load one Glossary at a time for now, please. */
+
+load_script(wp_gp_tools_glossaries);
+load_script(wp_gp_tools_scripts );
+
 
 parse_img();
 function parse_img(){
 	var warning_icon = chrome.extension.getURL('img/warning.png');
+	var notice_icon = chrome.extension.getURL('img/notice.png');
 	var img_script = document.createElement('script');
 	img_script.type = 'text/javascript';
-	img_script.innerHTML = ' var warning_icon = "' + warning_icon + '";';    
+	img_script.innerHTML = ' var warning_icon = "' + warning_icon + '"; var notice_icon = "' + notice_icon + '";';    
 	document.getElementsByTagName('head')[0].appendChild(img_script);
 }
 
-function script(url) {
+function load_script(url) {
   if (Array.isArray(url)) {
     var self = this,
       prom = [];
     url.forEach(function(item) {
-      prom.push(self.script(item));
+      prom.push(self.load_script(item));
     });
     return Promise.all(prom);
   } 
@@ -29,7 +38,7 @@ function script(url) {
 	t = document.getElementsByTagName('head')[0],
     s = document.createElement('script'); 
     s.type = 'text/javascript';
-    s.src = chrome.extension.getURL('js/wporg-better-gp-' + url + '.js');
+    s.src = chrome.extension.getURL('js/wp-gp-tools-' + url + '.js');
     s.async = false;
     s.onload = s.onreadystatechange = function() {
       if (!r && (!this.readyState || this.readyState === 'complete')) {
