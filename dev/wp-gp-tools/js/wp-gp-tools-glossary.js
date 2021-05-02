@@ -1,7 +1,7 @@
 ( function( $ ){
 	
-
-$(document).ready(display_glossary);	
+if( settings['ro_glossary']['state'] == "enabled" )
+	$(document).ready(display_glossary);	
 
 const pathname = window.location.pathname;
 var findlocale = pathname.split("/");

@@ -1,18 +1,18 @@
 /* Settings */
-.wpgpt-options td { padding:7px;}
-.wpgpt-options tr:nth-child(even){
+.wpgpt-settings-table td { padding:7px;}
+.wpgpt-settings-table tr:nth-child(even){
 	background-color:#ececec;
 }
-.wpgpt-options label,
-.wpgpt-options input{
+.wpgpt-settings-table label,
+.wpgpt-settings-table input{
     cursor:pointer;
 }
 
-.wpgpt-options {
+.wpgpt-settings-table {
     width: 100%;
 }
 
-.wpgpt-options tr td:nth-child(1) {
+.wpgpt-settings-table tr td:nth-child(1) {
     width:40%;
 }
 
@@ -21,13 +21,19 @@
     color:#0073aa;
     font-size:1.3em;
 }
+.wpgpt_settings_window .wpgpt-settings-self h3 {
+    font-size:1.6em;
+}
 
-.wpgpt_settings_window .note {
-    margin-top:25px;
+.wpgpt_settings_window .note a{
+
+	float:right;
+	font-weight: 600;
+	color: #0073aa;
 }
 
 .wpgpt_settings_window  {
-   height: 100vh;
+   min-height: 100vh;
 }
 
 /* Snippets */
@@ -65,8 +71,15 @@ ul.wpgpt-warnings-list li {
 }
 
 .wpgpt-ignore-warnings {
-	margin-top: 10px;
 	display: none;
+	float: right;
+    margin: 0 10px;
+    color: red;
+}
+.wpgpt-ignore-warnings label,
+.wpgpt-ignore-warnings input
+{
+    cursor:pointer;
 }
 .wpgpt-filters{
 	display: inline-block;
@@ -99,7 +112,6 @@ ul.wpgpt-warnings-list li {
 	margin-left: 5px;
 }
 
-.wpgpt-search-close-tabs,
 .wpgpt-search-plugin-slug {
 	display: none;
 }

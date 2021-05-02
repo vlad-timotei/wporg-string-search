@@ -1426,6 +1426,14 @@ var wpgpt_glossary = [
 	 "ro": '<a href="https://wpromania.slack.com/archives/D01TQE579L3/p1619533299034400">Selectează articolul</a>'
   },
   {
+	 "en": 'Choose Category',
+	 "ro": '<a href="https://wpromania.slack.com/archives/D01TQE579L3/p1619533299034400">Alege o categorie</a>'
+  },
+   {
+	 "en": 'Select Category',
+	 "ro": '<a href="https://wpromania.slack.com/archives/D01TQE579L3/p1619533299034400">Selectează categoria</a>'
+  },
+  {
 	"en": 'click',
 	"ro": 'dă cli<b>c</b>'
   }

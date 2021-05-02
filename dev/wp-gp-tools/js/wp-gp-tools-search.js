@@ -1,3 +1,9 @@
+var user_settings = { 'search' : 'enabled' }; 
+
+if(getLS('wpgpt-user-settings') !== null)
+	user_settings = JSON.parse( getLS('wpgpt-user-settings') ); 
+
+if( user_settings ['search'] == "enabled"){
 ( function( $ ){
 
 var tabs = [];
@@ -45,7 +51,7 @@ function display_html_output(){
 	search_html_output += " <input type='text' class='wpgpt-search-plugin-slug' name='wpgpt-search-plugin-slug' placeholder=' enter slug' size='15'  >";
 	search_html_output += "<br ><label class='noselect'><input type='checkbox' data-search-project='wp' class='wpgpt-search-option'> WordPress </label><br >";
 	search_html_output += "<label class='noselect'><input type='checkbox' data-search-project='consistency' class='wpgpt-search-option'> consistency tool</label>";
-	search_html_output += "<br ><br ><button type='button' class='wpgpt-search-close-tabs'>Close all</button>";
+	search_html_output += "<br ><br ><button type='button' class='wpgpt-search-close-tabs' style='display:none;'>Close all</button>";
     search_html_output += "</form>";
 
     const result_page_html_output = "<p class=\"wpgpt-results-notice\">When you're done on these result pages click <span>Close all</span> in the main tab to close them all.</p>";
@@ -210,6 +216,8 @@ function close_tabs(tags_group) {
 }
 
 })( jQuery );
+}
+
 
 function deparam(query) {
     var pairs, i, keyValuePair, key, value, map = {};
@@ -239,3 +247,20 @@ function getLS(name) {
 function delLS(name){
   localStorage.removeItem(name);
 }
+
+/** toDo - this doesn't work - maybe relocate
+let params = new URLSearchParams(document.location.search.substring(1));
+let is_result_page = params.get("resultpage");
+	if (is_result_page !== null) {
+   
+    $(document).ready(function() {
+		jQuery("#toggle-translations-unique").click();
+	 
+	 if($(".breadcrumb").lenght)
+      $([document.documentElement, document.body]).animate({
+        scrollTop: $(".breadcrumb").offset().top
+      }, 5);
+	  
+    });
+  }
+*/

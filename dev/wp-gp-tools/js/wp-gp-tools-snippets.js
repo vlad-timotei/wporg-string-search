@@ -1,6 +1,7 @@
 ( function( $ ){
 
-  $(document).ready(snippets_init);
+if(settings['snippets']['state'] == "enabled") 
+	$(document).ready(snippets_init);
 
 function snippets_init(){
 	const pathname = window.location.pathname;

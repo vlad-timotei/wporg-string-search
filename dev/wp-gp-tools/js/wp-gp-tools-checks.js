@@ -11,9 +11,11 @@
 *	- & symbol (ro_RO)
 **/
 
-$(document).ready(checks_init);
+if( settings['checks']['state'] == "enabled" || settings['ro_checks']['state'] == "enabled" )
+	$(document).ready(checks_init);
 
 var next_is_strict = true; // When false, allow Save / Approve next string with errors
+var notification_error_message = "<b>Fix warnings first!</b><br><br>Alternatively, check <br><i>Save / Approve with warnings!</i><br><br>";
 
 function checks_init(){
 	if( typeof $gp !== 'undefined'){		
@@ -65,7 +67,7 @@ function init_new_translations_checks(){
 		if( !run_this_translation_checks( translation_id ) && next_is_strict )
             {event.preventDefault();
 			 event.stopPropagation();
-			 $gp.notices.error( 'Errors detected! Check Errors Pannel!' );
+			 $gp.notices.error( notification_error_message );
 			}
 			next_is_strict = true;
 		});
@@ -74,12 +76,12 @@ function init_new_translations_checks(){
 			if( !run_this_translation_checks( translation_id ) && next_is_strict )
             {event.preventDefault();
 			 event.stopPropagation();
-			 $gp.notices.error( 'Errors detected! Check Errors Pannel!' );
+			 $gp.notices.error( notification_error_message );
 			}
 			next_is_strict = true;
 		});
 		
-		$(this).find(".meta").prepend('<div class="wpgpt-ignore-warnings"><label><input type="checkbox"> save with warnings</label></div>');	
+		$(this).find(".translation-wrapper").after('<div class="wpgpt-ignore-warnings noselect"><label>Save / Approve with warnings <input type="checkbox"></label></div>');	
 	});
    
    $(".wpgpt-ignore-warnings input").click(function(){
@@ -200,7 +202,6 @@ function run_current_translations_checks(){
 		
 		editor_html_output = '<div class="wpgpt-checks-list">' + editor_html_output + '</div>';
 
-
 		if( preview_warning ){
 			preview_html_output = '<div class="wpgpt-warning-preview"> <img class src="' + warning_icon + '"></div>';
 			$("#" + $(this).attr('id').replace('preview', 'editor')).find('.wpgpt-ignore-warnings').show();	
@@ -221,23 +222,20 @@ function run_current_translations_checks(){
 
 function check_translation (original, translated){
 	var warnings = {
+		'placeholders'		:	"",
 		'start_space' 		:	"",
 		'end_char'			: 	"",
-		'placeholders'		:	"",
-		'wrong_diacritics'	:	"",
-		'wrong_quotes'		:	"",
-		'others'			:	""
-		
+		'others'			:	"",
+		'ro_diacritics'		:	"",
+		'ro_quotes'			:	""
 	};
-	
 	var notices = {
+		'placeholders'		:	"",
 		'start_space' 		:	"",
 		'end_char'			: 	"",
-		'placeholders'		:	"",
-		'wrong_diacritics'	:	"",
-		'wrong_quotes'		:	"",
-		'others'			:	""
-		
+		'others'			:	"",
+		'ro_diacritics'	:	"",
+		'ro_quotes'		:	""
 	};
 	
 	let first_original_char = original.substr(0, 1);
@@ -249,38 +247,59 @@ function check_translation (original, translated){
 	let last_two_original_char = original.substr(original.length-2,2);
 	let last_two_translated_char = translated.substr(translated.length-2,2);
 	
-	let wrong_double_spaces = /  /g;
-	
-	/** Romanian specific rules **/
-	let wrong_diacritics =  /[ÃãŞşŢţ]/ig;  
-	let wrong_quotes = /[^=]"(?:[^"<=]*)"/g;
-	let wrong_slash_spaces = / [/] /g;
-	let wrong_and = /[&](?!.{1,7}?;)/g;
-
-	
 	var error_message = "";
-	
-	/** RegEx explications
-	**	wrong_double_spaces = /  /g;			Find globally double spaces
-	**	wrong_diacritics =  /[ÃãŞşŢţ]/ig; 		Find globally, case insensitive any of the chars inside []
-	**	wrong_quotes = /[^=]"(?:[^"<=]*)"/g;	Find globally strings, using a non-capturing group
-	**											- doesn't start with =
-	**											- next, have "
-	**											- next, don't have ", = nor < in any of the following characters
-	**											- ends with "
-	** wrong_slash_spaces = / [/] /g;			Find globally strings that have space/space
-	** wrong_and = /[&](?!.{1,7}?;)/g;			Find globally strings, using negative lookahead and lazy matching
-	**											- starts with &
-	**											- doesn't have ; after 1 to 7 characters
-	**/ 
+		
+	/** Wrong Placeholders **/
+	let placeholder_pattern =  /(?:%[a-z]|%\d[$][a-z])/ig; 
+	var original_ph = original.match(placeholder_pattern);
+	var translated_ph = translated.match(placeholder_pattern);
+
+	if(
+		original_ph != null ||
+		translated_ph != null
+	){
+		if(
+			original_ph != null &&
+			translated_ph == null
+		){
+			warnings['placeholders'] = "<li>Missing placeholder(s): " + original_ph.toString() + "</li>";
+		} else {
+			if(
+				original_ph == null &&
+				translated_ph != null
+			){
+				warnings['placeholders'] = "<li>Additional placeholder(s): " + translated_ph.toString() + "</li>";
+			} else {
+				if (original_ph.length < translated_ph.length)
+					warnings['placeholders'] = "<li>Additional placeholder(s) found</li>";
+				if (original_ph.length > translated_ph.length)
+					warnings['placeholders'] = "<li>Placeholder(s) missing or broken</li>";
+				if (original_ph.length == translated_ph.length) {
+					original_ph.sort();
+					translated_ph.sort();
+					var broken_placeholders = [];
+					for (var i = 0; i < original_ph.length; i++)
+						if (original_ph[i] != translated_ph[i]){
+							broken_placeholders.push(translated_ph[i]);
+						}
+					if (broken_placeholders.length){
+						warnings['placeholders'] = "<li>Possible broken placeholder(s): " + broken_placeholders.toString() + "</li>";
+					}
+				}
+			}
+		}
+	}
+
+/** General checks */
+if( settings['checks']['state'] == "enabled" ){
 	
 	/** Additional start space **/
 	if(
 		first_translated_char == " " &&
 		first_original_char  != " "
 	){  
-		error_message = "Additional start space";
-		switch(settings['start_space']['action']){
+		error_message = "<li>Additional start space</li>";
+		switch(settings['start_space']['state']){
 			case "warning": warnings['start_space'] = error_message; break;
 			case "notice": notices['start_space'] = error_message; 
 		}
@@ -291,8 +310,8 @@ function check_translation (original, translated){
 		first_translated_char != " " &&
 		first_original_char  == " "
 	){	
-		error_message = "Missing start space";
-		switch(settings['start_space']['action']){
+		error_message = "<li>Missing start space</li>";
+		switch(settings['start_space']['state']){
 			case "warning": warnings['start_space'] = error_message; break;
 			case "notice": notices['start_space'] = error_message; 
 		}
@@ -303,8 +322,8 @@ function check_translation (original, translated){
 		
 		/** Additional end space **/
 	    if( last_translated_char == " "){
-			error_message = "Additional end space";
-			switch(settings['end_space']['action']){
+			error_message = "<li>Additional end space</li>";
+			switch(settings['end_space']['state']){
 				case "warning": warnings['end_char'] = error_message; break;
 				case "notice": notices['end_char'] = error_message; 
 			}
@@ -315,8 +334,8 @@ function check_translation (original, translated){
 			last_original_char == " " &&
 			warnings['end_char'] == ""
 		){
-			error_message = "Missing end space";
-			switch(settings['end_space']['action']){
+			error_message = "<li>Missing end space</li>";
+			switch(settings['end_space']['state']){
 				case "warning": warnings['end_char'] = error_message; break;
 				case "notice": notices['end_char'] = error_message; 
 			}
@@ -329,8 +348,8 @@ function check_translation (original, translated){
 			last_two_original_char != ').' &&
 			warnings['end_char'] == ""
 		){
-			error_message = "Missing end .";
-			switch(settings['end_period']['action']){
+			error_message = "<li>Missing end .</li>";
+			switch(settings['end_period']['state']){
 				case "warning": warnings['end_char'] = error_message; break;
 				case "notice": notices['end_char'] = error_message; 
 			}
@@ -345,8 +364,8 @@ function check_translation (original, translated){
 			last_two_translated_char != '>.' &&
 			warnings['end_char'] == ""
 		){		
-			error_message = "Additional end .";
-			switch(settings['end_period']['action']){
+			error_message = "<li>Additional end .</li>";
+			switch(settings['end_period']['state']){
 				case "warning": warnings['end_char'] = error_message; break;
 				case "notice": notices['end_char'] = error_message; 
 			}
@@ -357,8 +376,8 @@ function check_translation (original, translated){
 			last_original_char == ":" &&
 			warnings['end_char'] == ""
 		){
-			error_message = "Missing end :";
-			switch(settings['end_colon']['action']){
+			error_message = "<li>Missing end :</li>";
+			switch(settings['end_colon']['state']){
 				case "warning": warnings['end_char'] = error_message; break;
 				case "notice": notices['end_char'] = error_message; 
 			}
@@ -368,8 +387,8 @@ function check_translation (original, translated){
 			last_translated_char == ":" &&
 			warnings['end_char'] == ""
 		){
-			error_message = "Additional end :";
-			switch(settings['end_colon']['action']){
+			error_message = "<li>Additional end :</li>";
+			switch(settings['end_colon']['state']){
 				case "warning": warnings['end_char'] = error_message; break;
 				case "notice": notices['end_char'] = error_message; 
 			}
@@ -387,7 +406,7 @@ function check_translation (original, translated){
 			last_two_original_char != '.)' &&
 			warnings['end_char'] == ""
 		){
-			error_message = "Notice: different ending symbol: <b>'" + last_original_char + "'</b>";
+			error_message = "<li>Notice: different ending symbol: <b>'" + last_original_char + "'</b></li>";
 			switch(settings['end_different']){
 				case "warning": warnings['end_char'] = error_message; break;
 				case "notice": notices['end_char'] = error_message; 
@@ -395,120 +414,90 @@ function check_translation (original, translated){
 		}
 	}
 	
-	/** ro_RO wrong diacritics **/
-	var using_wrong_diacritics = translated.match(wrong_diacritics);
-		if(using_wrong_diacritics != null){
-			error_message = using_wrong_diacritics.length + ' wrong diacritic(s) found: ' + using_wrong_diacritics.toString();
-			switch(settings['ro_diacritics']['action']){
-				case "warning": warnings['wrong_diacritics'] = error_message; break;
-				case "notice": notices['wrong_diacritics'] = error_message; 
-			}
-		}
-		
-	/** ro_RO wrong quotes **/
-	var using_wrong_quotes = translated.match(wrong_quotes);
-		if(using_wrong_quotes != null)
-		{   var i;
-			for (i = 0; i < using_wrong_quotes.length; i++) 
-              using_wrong_quotes [i] = using_wrong_quotes[i].substring(1)
-			
-			error_message = using_wrong_quotes.length + ' pair' + ( ( i > 1 ) ? 's' : '' ) + ' of wrong quotes: ' + using_wrong_quotes.toString() + " Use „ ”";
-			switch(settings['ro_quotes']['action']){
-				case "warning": warnings['wrong_quotes'] = error_message; break;
-				case "notice": notices['wrong_quotes'] = error_message; 
-			}
-		}
-	
-	/** Wrong Placeholders **/
-	let placeholder_pattern =  /(?:%[a-z]|%\d[$][a-z])/ig; 
-	var original_ph = original.match(placeholder_pattern);
-	var translated_ph = translated.match(placeholder_pattern);
-
-	if(
-		original_ph != null ||
-		translated_ph != null
-	){
-		if(
-			original_ph != null &&
-			translated_ph == null
-		){
-			warnings['placeholders'] = "Missing placeholder(s): " + original_ph.toString();
-		} else {
-			if(
-				original_ph == null &&
-				translated_ph != null
-			){
-				warnings['placeholders'] = "Additional placeholder(s): " + translated_ph.toString();
-			} else {
-				if (original_ph.length < translated_ph.length)
-					warnings['placeholders'] = "Additional placeholder(s) found";
-				if (original_ph.length > translated_ph.length)
-					warnings['placeholders'] = "Placeholder(s) missing or broken";
-				if (original_ph.length == translated_ph.length) {
-					original_ph.sort();
-					translated_ph.sort();
-					var broken_placeholders = [];
-					for (var i = 0; i < original_ph.length; i++)
-						if (original_ph[i] != translated_ph[i]){
-							broken_placeholders.push(translated_ph[i]);
-						}
-					if (broken_placeholders.length){
-						warnings['placeholders'] = "Possible broken placeholder(s): " + broken_placeholders.toString();
-					}
-				}
-			}
-		}
-	}
-	
 	/**Double spaces **/
-	var double_spaces = translated.match(wrong_double_spaces);
-	if( double_spaces != null ){
-		error_message = "<li>" + double_spaces.length + " double space(s) detected </li>"; 
-		switch(settings['double_spaces']['action']){
+	let double_spaces = /  /g;
+	var using_double_spaces = translated.match(double_spaces);
+	if( using_double_spaces != null ){
+		error_message = "<li>" + using_double_spaces.length + " double space(s) detected </li>"; 
+		switch(settings['double_spaces']['state']){
 				case "warning": warnings['others'] += error_message; break;
 				case "notice": notices['others'] += error_message; 
 		}
 	}
+}
+
+/** Romanian checks **/
+if( settings['ro_checks']['state'] == "enabled" ){
+	let not_ro_diacritics =  /[ÃãŞşŢţ]/ig;  
+	let not_ro_quotes = /[^=]"(?:[^"<=]*)"/g;
+	let not_ro_slash_spaces = / [/] /g;
+	let not_ro_ampersand = /[&](?!.{1,7}?;)/g;
+
+	/** RegEx explications
+	**	not_ro_diacritics =  /[ÃãŞşŢţ]/ig; 		Find globally, case insensitive any of the chars inside []
+	**	not_ro_quotes = /[^=]"(?:[^"<=]*)"/g;	Find globally strings, using a non-capturing group
+	**											- doesn't start with =
+	**											- next, have "
+	**											- next, don't have ", = nor < in any of the following characters
+	**											- ends with "
+	** not_ro_slash_spaces = / [/] /g;			Find globally strings that have space/space
+	** not_ro_ampersand = /[&](?!.{1,7}?;)/g;	Find globally strings, using negative lookahead and lazy matching
+	**											- starts with &
+	**											- doesn't have ; after 1 to 7 characters
+	**/ 
 	
-	/** ro_RO slash spaces **/
-	var slash_spaces = translated.match(wrong_slash_spaces);
-	if (slash_spaces != null){
-		error_message =  "<li>" + slash_spaces.length + " / space detected </li>";
-		switch(settings['ro_slash']['action']){
-				case "warning": warnings['others'] += error_message; break;
-				case "notice": notices['others'] += error_message; 
+	/** ro diacritics **/
+	var not_using_ro_diacritics = translated.match(not_ro_diacritics);
+		if(not_using_ro_diacritics != null){
+			error_message = "<li>" + not_using_ro_diacritics.length + ' wrong diacritic(s) found: ' + not_using_ro_diacritics.toString() + "</li>";
+			switch(settings['ro_diacritics']['state']){
+				case "warning": warnings['ro_diacritics'] = error_message; break;
+				case "notice": notices['ro_diacritics'] = error_message; 
+			}
 		}
-	}
-	
-	/** ro_RO & **/
-	var and_symb = translated.match(wrong_and);
-	if (and_symb != null){
-		error_message = "<li>" + and_symb.length + " & detected</li>";
-		switch(settings['ro_ampersand']['action']){
-				case "warning": warnings['others'] += error_message; break;
-				case "notice": notices['others'] += error_message; 
-		}
-	}
 		
-	/** Results **/
-	var warnings_results = ( warnings['start_space'] != "" ) ? ( '<li>' + warnings['start_space'] + '</li>' ) : '';
-    warnings_results +=	( warnings['end_char'] != "" ) ? ( '<li>' + warnings['end_char'] + '</li>' ) : '';
-	warnings_results +=	( warnings['placeholders'] != "" ) ? ( '<li>' + warnings['placeholders'] + '</li>' ) : '';
-	warnings_results +=	( warnings['wrong_diacritics'] != "" ) ? ( '<li>' + warnings['wrong_diacritics'] + '</li>' ) : '';
-	warnings_results +=	( warnings['wrong_quotes'] != "" ) ? ( '<li>' + warnings['wrong_quotes'] + '</li>' ) : '';
-	warnings_results +=	( warnings['others'] != "" ) ?  warnings['others']  : '';
-	warnings_results  = ( warnings_results == "" ) ? "none" : ( '<ul class="wpgpt-warnings-list">' + warnings_results + '</ul>');
+	/** ro quotes **/
+	var not_using_ro_quotes = translated.match(not_ro_quotes);
+		if(not_using_ro_quotes != null)
+		{   var i;
+			for (i = 0; i < not_using_ro_quotes.length; i++) 
+              not_using_ro_quotes [i] = not_using_ro_quotes[i].substring(1)
+			
+			error_message = "<li>" + not_using_ro_quotes.length + ' pair' + ( ( i > 1 ) ? 's' : '' ) + ' of wrong quotes: ' + not_using_ro_quotes.toString() + " Use „ ”</li>";
+			switch(settings['ro_quotes']['state']){
+				case "warning": warnings['ro_quotes'] = error_message; break;
+				case "notice": notices['ro_quotes'] = error_message; 
+			}
+		}
+
+	/** ro slash spaces **/
+	var not_using_ro_slash_spaces = translated.match(not_ro_slash_spaces);
+	if ( not_using_ro_slash_spaces != null ){
+		error_message =  "<li>" + not_using_ro_slash_spaces.length + " / space detected </li>";
+		switch(settings['ro_slash']['state']){
+				case "warning": warnings['others'] += error_message; break;
+				case "notice": notices['others'] += error_message; 
+		}
+	}
 	
-	var notices_results = ( notices['start_space'] != "" ) ? ( '<li>' + notices['start_space'] + '</li>' ) : '';
-    notices_results +=	( notices['end_char'] != "" ) ? ( '<li>' + notices['end_char'] + '</li>' ) : '';
-	notices_results +=	( notices['placeholders'] != "" ) ? ( '<li>' + notices['placeholders'] + '</li>' ) : '';
-	notices_results +=	( notices['wrong_diacritics'] != "" ) ? ( '<li>' + notices['wrong_diacritics'] + '</li>' ) : '';
-	notices_results +=	( notices['wrong_quotes'] != "" ) ? ( '<li>' + notices['wrong_quotes'] + '</li>' ) : '';
-	notices_results +=	( notices['others'] != "" ) ?  notices['others']  : '';
+	/** ro ampersand **/
+	var not_using_ro_ampersand = translated.match(not_ro_ampersand);
+	if ( not_using_ro_ampersand!= null ){
+		error_message = "<li>" + not_using_ro_ampersand.length + " & detected</li>";
+		switch(settings['ro_ampersand']['state']){
+				case "warning": warnings['others'] += error_message; break;
+				case "notice": notices['others'] += error_message; 
+		}
+	}
+}
+   
+	var warnings_results = Object.values(warnings).join("");
+	warnings_results  = ( warnings_results == "" ) ? "none" : ( '<ul class="wpgpt-warnings-list">' + warnings_results + '</ul>');
+
+	var notices_results = Object.values(notices).join("");
 	notices_results  =  ( notices_results == "" ) ? "none" : ( '<ul class="wpgpt-notices-list">' + notices_results + '</ul>');
 	
-	var results = [ warnings_results, notices_results ];
-		
+	var results = [ warnings_results, notices_results ]; 
 	return results;
 }
 
@@ -544,7 +533,7 @@ function keyboard_shortcuts(){
 				}	
 				
 				if( !run_this_translation_checks( $gp.editor.current.attr( 'id' ) ) && next_is_strict ){
-					$gp.notices.error( 'Errors detected!' );
+					$gp.notices.error( notification_error_message );
 					return false;	
 				} else {
 					$gp.editor.save( $gp.editor.current.find( 'button.translation-actions__save' ) );
@@ -557,7 +546,7 @@ function keyboard_shortcuts(){
 					if( approve.length > 0 ){
 						
 						if( !run_this_translation_checks( $gp.editor.current.attr( 'id' ) ) && next_is_strict ){
-							$gp.notices.error( 'Errors detected!' );
+							$gp.notices.error( notification_error_message );
 							return false;	
 						} else {
 							approve.trigger( 'click' );
