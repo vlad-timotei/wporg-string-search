@@ -226,6 +226,7 @@ function update_settings(name, val, once){
  ** Based on: https://meta.trac.wordpress.org/browser/sites/trunk/wordpress.org/public_html/wp-content/plugins/wporg-gp-customizations/templates/js/editor.js#L143
  */
 
+if( typeof $gp !== 'undefined'){
  $gp.editor.show = ( function( original ) {
 	 return function(element) {
 		 original.apply( $gp.editor, arguments );	 			
@@ -236,5 +237,5 @@ function update_settings(name, val, once){
 			 });
 		}
 	})( $gp.editor.show );
-	
+}
 })( jQuery );

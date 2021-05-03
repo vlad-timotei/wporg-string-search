@@ -10,15 +10,16 @@ const short_locale = $(findlocale).get(-3);
 
 function display_glossary(){
  var orig_txt, string_id, wpgpt_glossary_output;
-	$(".wpgpt-search").each(function() {
+	$(".editor-panel__right .panel-content").each(function() {
 		string_id = $(this).closest('tr').attr('id');
 		orig_txt = $( "#" + string_id + " .source-string__singular span.original" ).text();
 		wpgpt_glossary_output="";
 		wpgpt_glossary.forEach(function (item, index) { wpgpt_glossary_output += show_word_in_glossary (item, index, orig_txt)});
 	
 	if(wpgpt_glossary_output!=""){
+		console.log("trying to load glossary");
 		wpgpt_glossary_output="<table class='my-glossary glossary'><thead><tr><th colspan='2'>My Glossary</th></tr></thead>"+wpgpt_glossary_output+"</table>";
-		$("#"+string_id+" .wpgpt-search").append(wpgpt_glossary_output); 
+		$("#"+string_id+" .editor-panel__right .panel-content").append(wpgpt_glossary_output); 
 	}
 			
 	});
