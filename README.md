@@ -1,6 +1,9 @@
-# Search strings across WordPress.org projects in your locale
+# This project has been merged in [WPGP Tools](https://github.com/vlad-timotei/wpgp-tools) 
 
-## About the project
+
+## Search strings across WordPress.org projects in your locale
+
+### About the project
 
 This is a Chrome extension, Firefox add-on or userscript to use with TamperMonkey or GreaseMonkey.
 
@@ -12,18 +15,18 @@ This script opens search results for
 - WordPress development project, current locale
 - consistency tool, current locale
 
-## Demo
+### Demo
 
 [![image](https://user-images.githubusercontent.com/65488419/114697845-0f3eee80-9d27-11eb-8356-4632871e9d3b.png)](https://www.youtube.com/watch?v=9TV8CAzpitE)
 
 
 
 
-## Isn't consistency tool enough? 
+### Isn't consistency tool enough? 
 The [consistency tool](https://translate.wordpress.org/consistency/) is awesome, but as far as I have seen, only finds full strings, not substrings.
 Example: even though the string "array" is inside some strings translated [here](https://translate.wordpress.org/projects/wp/dev/ro/default/?filters%5Bterm%5D=array), the consistency tool doesn't find any [here](https://translate.wordpress.org/consistency/?search=array&set=ro%2Fdefault&project=) so you have to search within the project for substrings. And since wildcard search is not (yet) possible ([see ticket](https://meta.trac.wordpress.org/ticket/5228)), this userscript might be a solution.
 
-## Installation
+### Installation
 
 ##### Google Chrome & Edge
 
@@ -46,15 +49,15 @@ Unfortunatelly, Firefox will let you use unpacked add-ons only temporary, having
 4. That's it! Go to a translate project to see it in action.
 
 
-## Known issues
+### Known issues
 - Script User version only: first use needs explicit permision for popups from this site
 - Extension & Addon are not packed, hence the Firefox problem with unsigned add-ons.
 - The repo doesn't use workflows to build the release additional zip - I couldn't make it work - if anyone has some hints, let me know.
 
-## Contributing
+### Contributing
 This version is just a proof of concept. Contributions are welcome, bugreports, suggestions and even pull requests! No limitations, shoot for the stars!
 
-## Changelog
+### Changelog
 
 ##### v.1.0
 - rudimentar userscript
